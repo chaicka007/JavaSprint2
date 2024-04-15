@@ -1,3 +1,10 @@
+package Managers;
+
+import Entities.Epic;
+import Entities.Status;
+import Entities.Subtask;
+import Entities.Task;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -59,7 +66,7 @@ public class TaskManager {
     }
 
     private void updateEpicStatus(long id) {
-        ArrayList<Task.Status> statuses = new ArrayList<>();
+        ArrayList<Status> statuses = new ArrayList<>();
         for (Subtask subtask : subtasks.values()) {
             if (subtask.getEpicId() == id) {
                 statuses.add(subtask.getStatus());
@@ -67,19 +74,19 @@ public class TaskManager {
         }
         if (statuses.size() > 1) {
             for (int i = 1; i < statuses.size(); i++) { //Сравнение всех статусов подзадач
-                if (statuses.get(i).equals(Task.Status.NEW) && statuses.get(i - 1).equals(Task.Status.NEW)) {
-                    epics.get(id).setStatus(Task.Status.NEW);
-                } else if (statuses.get(i).equals(Task.Status.DONE) && statuses.get(i - 1).equals(Task.Status.DONE)) {
-                    epics.get(id).setStatus(Task.Status.DONE);
+                if (statuses.get(i).equals(Status.NEW) && statuses.get(i - 1).equals(Status.NEW)) {
+                    epics.get(id).setStatus(Status.NEW);
+                } else if (statuses.get(i).equals(Status.DONE) && statuses.get(i - 1).equals(Status.DONE)) {
+                    epics.get(id).setStatus(Status.DONE);
                 } else {
-                    epics.get(id).setStatus(Task.Status.IN_PROGRESS);
+                    epics.get(id).setStatus(Status.IN_PROGRESS);
                     break;
                 }
             }
         } else if (statuses.size() == 1) {
             epics.get(id).setStatus(statuses.getFirst());
         } else {
-            epics.get(id).setStatus(Task.Status.NEW);
+            epics.get(id).setStatus(Status.NEW);
         }
     }
 

@@ -1,3 +1,5 @@
+package Entities;
+
 public class Epic extends Task {
     public Epic(String name, String description) {
         super(name, description);
@@ -5,6 +7,6 @@ public class Epic extends Task {
 
     @Override
     public String toString() {
-        return "Epic{ " + super.toString() + "}";
+        return "Entities.Epic{ " + super.toString() + "}";
     }
 }

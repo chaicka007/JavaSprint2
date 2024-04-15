@@ -1,3 +1,5 @@
+package Entities;
+
 public class Subtask extends Task {
     private long epicId;
 
@@ -17,7 +19,7 @@ public class Subtask extends Task {
 
     @Override
     public String toString() {
-        return "Subtask{" +
+        return "Entities.Subtask{" +
                 "epicId=" + epicId + super.toString() +
                 "} ";
     }
