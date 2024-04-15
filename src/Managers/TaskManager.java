@@ -13,6 +13,10 @@ public class TaskManager {
     HashMap<Long, Epic> epics = new HashMap<>();
     HashMap<Long, Subtask> subtasks = new HashMap<>();
     long idCount = 0;
+    private long countId(){
+        idCount++;
+        return idCount;
+    }
 
     public void newTask(Task newTask) { //Создание новой задачи
         for (Task task : tasks.values()) {
@@ -53,7 +57,7 @@ public class TaskManager {
     }
 
     public void updateTask(Task updateTask) { //Обновление задачи,
-        // проверка что id задачи существует и задача не повторяется
+        // проверка, что id задачи существует и задача не повторяется
         if (tasks.containsKey(updateTask.getId()) && !updateTask.equals(tasks.get(updateTask.getId()))) {
             tasks.put(updateTask.getId(), updateTask);
         }
@@ -98,9 +102,7 @@ public class TaskManager {
     }
 
     public void deleteTaskById(long id) { //удаление задачи по id
-        if (tasks.containsKey(id)) {
-            tasks.remove(id);
-        }
+        tasks.remove(id);
     }
 
     public void deleteEpicById(long id) {
@@ -153,9 +155,8 @@ public class TaskManager {
     }
 
     public void removeEpics() {
-        for (long id : epics.keySet()) {
-            deleteEpicById(id);
-        }
+        epics.clear();
+        subtasks.clear(); //Удаление всех подзадач, тк эпиков больше нет
     }
 
     public void removeSubtasks() {
