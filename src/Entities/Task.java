@@ -14,11 +14,6 @@ public class Task {
         this.status = Entities.Status.NEW;
     }
 
-    public Task(String name, String description, Status status) {
-        this.name = name;
-        this.description = description;
-        this.status = status;
-    }
 
     public Task(String name, String description, Status status, long id) {
         this.name = name;
