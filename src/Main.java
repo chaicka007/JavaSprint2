@@ -1,8 +1,8 @@
-import Entities.Epic;
-import Entities.Status;
-import Entities.Subtask;
-import Entities.Task;
-import Managers.TaskManager;
+import entities.Epic;
+import entities.Status;
+import entities.Subtask;
+import entities.Task;
+import managers.TaskManager;
 
 public class Main {
     public static void main(String[] args) {

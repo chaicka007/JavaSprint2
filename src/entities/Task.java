@@ -1,4 +1,4 @@
-package Entities;
+package entities;
 
 import java.util.Objects;
 
@@ -11,7 +11,7 @@ public class Task {
     public Task(String name, String description) {
         this.name = name;
         this.description = description;
-        this.status = Entities.Status.NEW;
+        this.status = entities.Status.NEW;
     }
 
 

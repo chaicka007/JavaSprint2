@@ -1,4 +1,4 @@
-package Entities;
+package entities;
 
 import java.util.ArrayList;
 
@@ -15,14 +15,6 @@ public class Epic extends Task {
 
     public void addSubtasksId(long id) {
         subtasksId.add(id);
-    }
-
-    public void clearSubtasksId() {
-        subtasksId.clear();
-    }
-
-    public void delSubtaskId(long id) {
-        subtasksId.remove(id);
     }
 
     @Override

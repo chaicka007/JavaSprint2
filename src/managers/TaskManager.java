@@ -1,9 +1,9 @@
-package Managers;
+package managers;
 
-import Entities.Epic;
-import Entities.Status;
-import Entities.Subtask;
-import Entities.Task;
+import entities.Epic;
+import entities.Status;
+import entities.Subtask;
+import entities.Task;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,7 +15,7 @@ public class TaskManager {
     Map<Long, Subtask> subtasks = new HashMap<>();
     long idCount = 0;
 
-    private long countId() {
+    private long generateId() {
         idCount++;
         return idCount;
     }
@@ -27,7 +27,7 @@ public class TaskManager {
                 return;
             }
         }
-        newTask.setId(countId());
+        newTask.setId(generateId());
         tasks.put(newTask.getId(), newTask);
     }
 
@@ -38,7 +38,7 @@ public class TaskManager {
                 return;
             }
         }
-        newEpic.setId(countId());
+        newEpic.setId(generateId());
         epics.put(newEpic.getId(), newEpic);
     }
 
@@ -50,7 +50,7 @@ public class TaskManager {
                 return;
             }
         }
-        newSubtask.setId(countId());
+        newSubtask.setId(generateId());
         subtasks.put(newSubtask.getId(), newSubtask);
         epics.get(newSubtask.getEpicId()).addSubtasksId(newSubtask.getId()); //Добавляем инфу о сабтасках в эпик
         updateEpicStatus(newSubtask.getEpicId());
@@ -94,7 +94,7 @@ public class TaskManager {
         if (subtasks.containsKey(id)) {
             long idEpic = subtasks.get(id).getEpicId();
             subtasks.remove(id);
-            epics.get(idEpic).delSubtaskId(id);
+            delEpicSubtaskId(idEpic, id);
             updateEpicStatus(idEpic);
         }
     }
@@ -130,9 +130,9 @@ public class TaskManager {
 
     public void removeSubtasks() {
         subtasks.clear();
-        for (Epic epic : epics.values()){
+        for (Epic epic : epics.values()) {
             epic.setStatus(Status.NEW);
-            epic.clearSubtasksId();
+            clearEpicSubtasksId(epic.getId());
         }
     }
 
@@ -169,5 +169,13 @@ public class TaskManager {
         } else {
             epics.get(id).setStatus(Status.NEW);
         }
+    }
+
+    private void clearEpicSubtasksId(long epicId) {
+        epics.get(epicId).getSubtasksId().clear();
+    }
+
+    private void delEpicSubtaskId(long epicId, long id) {
+        epics.get(epicId).getSubtasksId().remove(id);
     }
 }
