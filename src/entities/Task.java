@@ -1,3 +1,5 @@
+package entities;
+
 import java.util.Objects;
 
 public class Task {
@@ -6,23 +8,12 @@ public class Task {
     private Status status;
     private long id;
 
-    public enum Status {
-        NEW,
-        IN_PROGRESS,
-        DONE;
-    }
-
     public Task(String name, String description) {
         this.name = name;
         this.description = description;
-        this.status = Status.NEW;
+        this.status = entities.Status.NEW;
     }
 
-    public Task(String name, String description, Status status) {
-        this.name = name;
-        this.description = description;
-        this.status = status;
-    }
 
     public Task(String name, String description, Status status, long id) {
         this.name = name;
@@ -64,7 +55,7 @@ public class Task {
 
     @Override
     public String toString() {
-        return "Task{" +
+        return "Entities.Task{" +
                 "name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", status=" + status +
