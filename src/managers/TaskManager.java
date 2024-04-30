@@ -10,44 +10,44 @@ import java.util.Map;
 public interface TaskManager {
 
 
-    public void newTask(Task newTask);
+    void newTask(Task newTask);
 
-    public void newEpic(Epic newEpic);
+    void newEpic(Epic newEpic);
 
-    public void newSubtask(Subtask newSubtask);
+    void newSubtask(Subtask newSubtask);
 
-    public void updateTask(Task updateTask);
+    void updateTask(Task updateTask);
 
-    public void updateEpic(Epic updateEpic);
+    void updateEpic(Epic updateEpic);
 
 
-    public void updateSubtask(Subtask updateSubtask);
+    void updateSubtask(Subtask updateSubtask);
 
-    public void deleteTaskById(long id);
+    void deleteTaskById(long id);
 
-    public void deleteEpicById(long id);
+    void deleteEpicById(long id);
 
-    public void deleteSubtaskById(long id);
+    void deleteSubtaskById(long id);
 
-    public Task getTask(long id);
+    Task getTask(long id);
 
-    public Epic getEpic(long id);
+    Epic getEpic(long id);
 
-    public Subtask getSubtask(long id);
+    Subtask getSubtask(long id);
 
-    public ArrayList getSubtaskByEpicId(long id);
+    ArrayList getSubtaskByEpicId(long id);
 
-    public void removeTasks();
+    void removeTasks();
 
-    public void removeEpics();
+    void removeEpics();
 
-    public void removeSubtasks();
+    void removeSubtasks();
 
-    public Map<Long, Task> getTasks();
+    Map<Long, Task> getTasks();
 
-    public Map<Long, Epic> getEpics();
+    Map<Long, Epic> getEpics();
 
-    public Map<Long, Subtask> getSubtasks();
-    public List<Task> getHistory();
+    Map<Long, Subtask> getSubtasks();
+    List<Task> getHistory();
 
 }
