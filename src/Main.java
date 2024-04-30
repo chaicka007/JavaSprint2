@@ -2,11 +2,13 @@ import entities.Epic;
 import entities.Status;
 import entities.Subtask;
 import entities.Task;
+import managers.InMemoryTaskManager;
+import managers.Managers;
 import managers.TaskManager;
 
 public class Main {
     public static void main(String[] args) {
-        TaskManager taskManager = new TaskManager();
+        TaskManager taskManager = Managers.getDefault();
         taskManager.newTask(new Task("Задача 1", "Описание 2 задачи"));
         taskManager.newTask(new Task("Задача 2", "Описание 2 супер задачи"));
         taskManager.newEpic(new Epic("Эпик 1", ""));
@@ -35,5 +37,20 @@ public class Main {
         System.out.println("проверка после удаления подзадачи 2 эпика");
         taskManager.deleteSubtaskById(7);
         System.out.println(taskManager.getEpics());
+        System.out.println("Проверка истории просмотра");
+        System.out.println(taskManager.getTask(1));
+        taskManager.getTask(2);
+        System.out.println(taskManager.getHistory());
+        taskManager.getTask(2);
+        taskManager.getTask(2);
+        taskManager.getTask(2);
+        taskManager.getEpic(4);
+        taskManager.getTask(2);
+        taskManager.getTask(2);
+        taskManager.getTask(2);
+        taskManager.getTask(2);
+        System.out.println(taskManager.getHistory());
+        taskManager.getTask(1); //Здесь 1 задача должна пропасть, тк их 10
+        System.out.println(taskManager.getHistory());
     }
 }
