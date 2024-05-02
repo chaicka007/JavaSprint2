@@ -6,11 +6,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class InMemoryHistoryManager implements HistoryManager {
-    List<Task> watchHistory = new LinkedList<>();
+    private List<Task> watchHistory = new LinkedList<>();
+    final int MAX_HISTORY_SIZE = 10;
 
     @Override
     public void add(Task task) {
-        if (watchHistory.size() < 10) {
+        if (watchHistory.size() < MAX_HISTORY_SIZE) {
             watchHistory.add(task);
         } else {
             watchHistory.removeFirst();

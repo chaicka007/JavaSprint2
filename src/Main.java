@@ -2,12 +2,12 @@ import entities.Epic;
 import entities.Status;
 import entities.Subtask;
 import entities.Task;
-import managers.Managers;
+import managers.TaskManagersCreator;
 import managers.TaskManager;
 
 public class Main {
     public static void main(String[] args) {
-        TaskManager taskManager = Managers.getDefault();
+        TaskManager taskManager = TaskManagersCreator.getDefault();
         taskManager.newTask(new Task("Задача 1", "Описание 2 задачи"));
         taskManager.newTask(new Task("Задача 2", "Описание 2 супер задачи"));
         taskManager.newEpic(new Epic("Эпик 1", ""));

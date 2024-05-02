@@ -5,14 +5,17 @@ import entities.Status;
 import entities.Subtask;
 import entities.Task;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class InMemoryTaskManager implements TaskManager {
-    Map<Long, Task> tasks = new HashMap<>();
-    Map<Long, Epic> epics = new HashMap<>();
-    Map<Long, Subtask> subtasks = new HashMap<>();
-    HistoryManager historyManager = Managers.getDefaultHistory();
-    long idCount = 0;
+    private Map<Long, Task> tasks = new HashMap<>();
+    private Map<Long, Epic> epics = new HashMap<>();
+    private Map<Long, Subtask> subtasks = new HashMap<>();
+    private HistoryManager historyManager = HistoryManagersCreator.getDefaultHistory();
+    private long idCount = 0;
 
     private long generateId() {
         idCount++;
@@ -125,7 +128,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public ArrayList<Subtask> getSubtaskByEpicId(long id) {
+    public List<Subtask> getSubtaskByEpicId(long id) {
         ArrayList<Subtask> subtaskArrayList = new ArrayList<>();
         for (Long subtaskId : epics.get(id).getSubtasksId()) {
             subtaskArrayList.add(subtasks.get(subtaskId));
