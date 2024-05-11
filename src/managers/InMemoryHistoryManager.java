@@ -7,7 +7,7 @@ import java.util.List;
 
 public class InMemoryHistoryManager implements HistoryManager {
     private List<Task> watchHistory = new LinkedList<>();
-    final int MAX_HISTORY_SIZE = 10;
+    private static final int MAX_HISTORY_SIZE = 10;
 
     @Override
     public void add(Task task) {
