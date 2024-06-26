@@ -8,9 +8,15 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
-public class FileBackedTasksManager extends InMemoryTaskManager{
+import entities.Type;
 
-    private final Path path;
+
+public class FileBackedTasksManager extends InMemoryTaskManager {
+
+    private  Path path = null;
+
+    public FileBackedTasksManager() {
+    }
 
     public FileBackedTasksManager(Path path) {
         this.path = path;
@@ -117,9 +123,30 @@ public class FileBackedTasksManager extends InMemoryTaskManager{
         return super.getHistory();
     }
 
-    private void save(){
-
+    public void save() {
+        for (Subtask subtask : getSubtasks().values()){
+            System.out.println(toString(subtask));
+        }
+        for (Task task : getTasks().values()){
+            System.out.println(toString(task));
+        }
     }
 
-    private
+    private String toString(Task task) {
+        StringBuilder sb = new StringBuilder();
+        if (task instanceof Subtask) {
+            sb.append(task.getId()).append(",").append(Type.SUBTASK).append(",").append(task.getName()).append(",")
+                    .append(task.getStatus()).append(",").append(task.getDescription()).append(",")
+                    .append(((Subtask) task).getEpicId());
+            return sb.toString();
+        } else if (task instanceof Epic) {
+            sb.append(task.getId()).append(",").append(Type.EPIC).append(",").append(task.getName()).append(",")
+                    .append(task.getStatus()).append(",").append(task.getDescription());
+        } else if (task != null) {
+            sb.append(task.getId()).append(",").append(Type.TASK).append(",").append(task.getName()).append(",")
+                    .append(task.getStatus()).append(",").append(task.getDescription());
+            return sb.toString();
+        }
+        return "error";
+    }
 }

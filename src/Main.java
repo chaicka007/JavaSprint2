@@ -1,12 +1,13 @@
 import entities.Epic;
 import entities.Subtask;
 import entities.Task;
+import managers.FileBackedTasksManager;
 import managers.TaskManagersCreator;
 import managers.TaskManager;
 
 public class Main {
     public static void main(String[] args) {
-        TaskManager taskManager = TaskManagersCreator.getDefault();
+        TaskManager taskManager = new FileBackedTasksManager();//TaskManagersCreator.getDefault();
         taskManager.newTask(new Task("Задача 1", "Описание 1 задачи"));
         taskManager.newTask(new Task("Задача 2", "Описание 2 супер задачи"));
         taskManager.newTask(new Task("Задача 3", "Описание 3 супер задачи"));
@@ -33,6 +34,7 @@ public class Main {
         System.out.println(taskManager.getHistory()); //3,1,6,4,7,8
         taskManager.deleteEpicById(4);
         System.out.println(taskManager.getHistory()); //3,1,6
+        ((FileBackedTasksManager) taskManager).save();
 
         /*System.out.println(taskManager.getTasks());
         System.out.println(taskManager.getEpics());
