@@ -27,7 +27,7 @@ public class HistoryList {
 
     public List<Task> getTasks() {
         List<Task> tasks = new ArrayList<>();
-        for (Node<Task> i = head; hasNext(i); i = i.next) {
+        for (Node<Task> i = head; i != null; i = i.next) {
             tasks.add(i.data);
         }
         return tasks;
@@ -40,9 +40,9 @@ public class HistoryList {
         }
     }
 
-    private boolean hasNext(Node<Task> node) {
+ /*   private boolean hasNext(Node<Task> node) {
         return node.next != null;
-    }
+    }*/
 
     private void linkLast(Task task) {
         final Node<Task> oldTail = tail;

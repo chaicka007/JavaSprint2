@@ -17,9 +17,10 @@ public class InMemoryTaskManager implements TaskManager {
     private final HistoryManager historyManager = HistoryManagersCreator.getDefaultHistory();
     private long idCount = 0;
 
-    private long generateId() {
-        idCount++;
-        return idCount;
+    private void generateId(Task task) {
+        if (task.getId() == 0){
+            task.setId(++idCount);
+        }
     }
 
     @Override
@@ -30,9 +31,7 @@ public class InMemoryTaskManager implements TaskManager {
                 return;
             }
         }
-        if (newTask.getId() == 0){
-            newTask.setId(generateId());
-        }
+        generateId(newTask);
         tasks.put(newTask.getId(), newTask);
     }
 
@@ -44,24 +43,20 @@ public class InMemoryTaskManager implements TaskManager {
                 return;
             }
         }
-        if (newEpic.getId() == 0){
-            newEpic.setId(generateId());
-        }
+        generateId(newEpic);
         epics.put(newEpic.getId(), newEpic);
     }
 
     @Override
     public void newSubtask(Subtask newSubtask) {
-        if (!epics.containsKey(newSubtask.getEpicId())) return; //Проверка что есть эпик с таким id
+        if (!epics.containsKey(newSubtask.getEpicId())) return; //Проверка, что есть эпик с таким id
         for (Subtask subtask : subtasks.values()) {
             if (newSubtask.equals(subtask)) {
                 System.out.println("Такая подзадача уже есть!");
                 return;
             }
         }
-        if (newSubtask.getId() == 0){
-            newSubtask.setId(generateId());
-        }
+        generateId(newSubtask);
         subtasks.put(newSubtask.getId(), newSubtask);
         epics.get(newSubtask.getEpicId()).addSubtasksId(newSubtask.getId()); //Добавляем инфу о сабтасках в эпик
         updateEpicStatus(newSubtask.getEpicId());

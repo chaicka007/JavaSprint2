@@ -18,35 +18,39 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
     public static void main(String[] args) {
         FileBackedTasksManager taskManager = new FileBackedTasksManager();
-        taskManager.newTask(new Task("Задача 1", "Описание 1 задачи"));
-        taskManager.newTask(new Task("Задача 2", "Описание 2 супер задачи"));
-        taskManager.newTask(new Task("Задача 3", "Описание 3 супер задачи"));
-        taskManager.newTask(new Task("Задача 4", "desc4", Status.NEW, 33));
-        taskManager.newEpic(new Epic("Эпик 1", "asasa"));
-        taskManager.newEpic(new Epic("эпик 2", "sasa"));
-        taskManager.newEpic(new Epic("эпик 3", "sasa"));
-        taskManager.newSubtask(new Subtask("Подзадача 1 эпика 1", "ее описание", 4));
-        taskManager.newSubtask(new Subtask("Подзадача 2 эпика 1", "ее описание", 4));
-        taskManager.newSubtask(new Subtask("Подзадача 1 эпика 2", "ее описание", 5));
-        taskManager.getTask(1);
-        taskManager.getTask(2);
-        taskManager.getTask(3);
-        taskManager.getTask(1);
-        taskManager.getTask(1);
-        System.out.println(taskManager.getTask(33));
-        System.out.println(taskManager.getHistory()); //Должен быть список просмотра без повтора в порядке 2,3,1
-        taskManager.deleteTaskById(2);
-        System.out.println(taskManager.getHistory()); //Должен быть список просмотра без повтора в порядке 3,1
-        taskManager.getEpic(6);
-        taskManager.getEpic(6);
-        System.out.println(taskManager.getHistory()); //3,1,6
-        taskManager.getEpic(4);
-        taskManager.getSubtask(7);
-        taskManager.getSubtask(8);
-        System.out.println(taskManager.getHistory()); //3,1,6,4,7,8
-        taskManager.deleteEpicById(4);
-        System.out.println(taskManager.getHistory()); //3,1,6
-        taskManager.save();
+//        taskManager.newTask(new Task("Задача 1", "Описание 1 задачи"));
+//        taskManager.newTask(new Task("Задача 2", "Описание 2 супер задачи"));
+//        taskManager.newTask(new Task("Задача 3", "Описание 3 супер задачи"));
+//        taskManager.newTask(new Task("Задача 4", "desc4", Status.NEW, 33));
+//        taskManager.newEpic(new Epic("Эпик 1", "asasa"));
+//        taskManager.newEpic(new Epic("эпик 2", "sasa"));
+//        taskManager.newEpic(new Epic("эпик 3", "sasa"));
+//        taskManager.newSubtask(new Subtask("Подзадача 1 эпика 1", "ее описание", 4));
+//        taskManager.newSubtask(new Subtask("Подзадача 2 эпика 1", "ее описание", 4));
+//        taskManager.newSubtask(new Subtask("Подзадача 1 эпика 2", "ее описание", 5));
+//        taskManager.getTask(1);
+//        taskManager.getTask(2);
+//        taskManager.getTask(3);
+//        taskManager.getTask(1);
+//        taskManager.getTask(1);
+//        System.out.println(taskManager.getTask(33));
+//        System.out.println(taskManager.getHistory()); //Должен быть список просмотра без повтора в порядке 2,3,1
+//        taskManager.deleteTaskById(2);
+//        System.out.println(taskManager.getHistory()); //Должен быть список просмотра без повтора в порядке 3,1
+//        taskManager.getEpic(6);
+//        taskManager.getEpic(6);
+//        System.out.println(taskManager.getHistory()); //3,1,6
+//        taskManager.getEpic(4);
+//        taskManager.getSubtask(7);
+//        taskManager.getSubtask(8);
+//        System.out.println(taskManager.getHistory()); //3,1,6,4,7,8
+//        taskManager.deleteEpicById(4);
+//        System.out.println(taskManager.getHistory()); //3,1,6
+//        taskManager.save();
+        taskManager.loadFromFile();
+        System.out.println(taskManager.getTasks());
+        System.out.println(taskManager.getEpics());
+        System.out.println(taskManager.getSubtasks());
     }
 
 
@@ -167,27 +171,24 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         }
     }
 
-//    public static void loadFromFile() {
-//        try (BufferedReader br = new BufferedReader(new FileReader(PATH_FILE))) {
-//            br.readLine(); // Пропуск 1 строки с названиями столбцов
-//            while (br.ready()) {
-//                String line = br.readLine();
-//                Task entity = fromString(line);
-//                if (entity instanceof Subtask) {
-//
-//                    return sb.toString();
-//                } else if (entity instanceof Epic) {
-//
-//                    return sb.toString();
-//                } else {
-//
-//                    return sb.toString();
-//                }
-//            }
-//        } catch (IOException e) {
-//            System.out.println(e.getMessage());
-//        }
-//    }
+    public void loadFromFile() {
+        try (BufferedReader br = new BufferedReader(new FileReader(PATH_FILE))) {
+            br.readLine(); // Пропуск 1 строки с названиями столбцов
+            while (br.ready()) {
+                String line = br.readLine();
+                Task entity = fromString(line);
+                if (entity instanceof Subtask) {
+                    newSubtask((Subtask) entity);
+                } else if (entity instanceof Epic) {
+                    newEpic((Epic) entity);
+                } else {
+                    newTask(entity);
+                }
+            }
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+    }
 
     private String toString(Task task) {
         StringBuilder sb = new StringBuilder();
