@@ -30,7 +30,9 @@ public class InMemoryTaskManager implements TaskManager {
                 return;
             }
         }
-        newTask.setId(generateId());
+        if (newTask.getId() == 0){
+            newTask.setId(generateId());
+        }
         tasks.put(newTask.getId(), newTask);
     }
 
@@ -42,7 +44,9 @@ public class InMemoryTaskManager implements TaskManager {
                 return;
             }
         }
-        newEpic.setId(generateId());
+        if (newEpic.getId() == 0){
+            newEpic.setId(generateId());
+        }
         epics.put(newEpic.getId(), newEpic);
     }
 
@@ -55,7 +59,9 @@ public class InMemoryTaskManager implements TaskManager {
                 return;
             }
         }
-        newSubtask.setId(generateId());
+        if (newSubtask.getId() == 0){
+            newSubtask.setId(generateId());
+        }
         subtasks.put(newSubtask.getId(), newSubtask);
         epics.get(newSubtask.getEpicId()).addSubtasksId(newSubtask.getId()); //Добавляем инфу о сабтасках в эпик
         updateEpicStatus(newSubtask.getEpicId());

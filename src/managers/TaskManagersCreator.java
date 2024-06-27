@@ -2,6 +2,6 @@ package managers;
 
 public class TaskManagersCreator {
     public static TaskManager getDefault() {
-        return new FileBackedTasksManager();
+        return new InMemoryTaskManager();
     }
 }
