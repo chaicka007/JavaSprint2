@@ -116,20 +116,17 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Task getTask(long id) { //Получение задачи по id
-        updateHistory(tasks.get(id)); //Обновляем историю просмотра
-        return tasks.get(id);
-    }
-
-    @Override
-    public Epic getEpic(long id) {
-        updateHistory(epics.get(id));
-        return epics.get(id);
-    }
-
-    @Override
-    public Subtask getSubtask(long id) {
-        updateHistory(subtasks.get(id));
-        return subtasks.get(id);
+        if (tasks.containsKey(id)){
+            updateHistory(tasks.get(id)); //Обновляем историю просмотра
+            return tasks.get(id);
+        } else if (epics.containsKey(id)) {
+            updateHistory(epics.get(id));
+            return epics.get(id);
+        } else if (subtasks.containsKey(id)) {
+            updateHistory(subtasks.get(id));
+            return subtasks.get(id);
+        }
+        return null;
     }
 
     @Override

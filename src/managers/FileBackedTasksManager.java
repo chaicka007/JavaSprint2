@@ -6,7 +6,6 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -18,8 +17,8 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
 
     public static void main(String[] args) {
-        FileBackedTasksManager taskManager = FileBackedTasksManager.loadFromFile();
-        //FileBackedTasksManager taskManager = new FileBackedTasksManager();
+          FileBackedTasksManager taskManager = FileBackedTasksManager.loadFromFile();
+//        FileBackedTasksManager taskManager = new FileBackedTasksManager();
 //        taskManager.newTask(new Task("Задача 1", "Описание 1 задачи"));
 //        taskManager.newTask(new Task("Задача 2", "Описание 2 супер задачи"));
 //        taskManager.newTask(new Task("Задача 3", "Описание 3 супер задачи"));
@@ -39,20 +38,18 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 //        System.out.println(taskManager.getHistory()); //Должен быть список просмотра без повтора в порядке 2,3,1
 //        taskManager.deleteTaskById(2);
 //        System.out.println(taskManager.getHistory()); //Должен быть список просмотра без повтора в порядке 3,1
-//        taskManager.getEpic(6);
-//        taskManager.getEpic(6);
+//        taskManager.getTask(6);
+//        taskManager.getTask(6);
 //        System.out.println(taskManager.getHistory()); //3,1,6
-//        taskManager.getEpic(4);
-//        taskManager.getSubtask(7);
-//        taskManager.getSubtask(8);
+//        taskManager.getTask(4);
+//        taskManager.getTask(7);
+//        taskManager.getTask(8);
 //        System.out.println(taskManager.getHistory()); //3,1,6,4,7,8
-//        taskManager.deleteEpicById(4);
-//        System.out.println(taskManager.getHistory()); //3,1,6
 //        taskManager.save();
 //        System.out.println(taskManager.getTasks());
 //        System.out.println(taskManager.getEpics());
 //        System.out.println(taskManager.getSubtasks());
-        System.out.println(taskManager.getHistory());
+          System.out.println(taskManager.getHistory());
 
     }
 
@@ -105,16 +102,6 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     @Override
     public Task getTask(long id) {
         return super.getTask(id);
-    }
-
-    @Override
-    public Epic getEpic(long id) {
-        return super.getEpic(id);
-    }
-
-    @Override
-    public Subtask getSubtask(long id) {
-        return super.getSubtask(id);
     }
 
     @Override
