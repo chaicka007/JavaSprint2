@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -17,7 +18,8 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
 
     public static void main(String[] args) {
-        FileBackedTasksManager taskManager = new FileBackedTasksManager();
+        FileBackedTasksManager taskManager = FileBackedTasksManager.loadFromFile();
+        //FileBackedTasksManager taskManager = new FileBackedTasksManager();
 //        taskManager.newTask(new Task("Задача 1", "Описание 1 задачи"));
 //        taskManager.newTask(new Task("Задача 2", "Описание 2 супер задачи"));
 //        taskManager.newTask(new Task("Задача 3", "Описание 3 супер задачи"));
@@ -47,10 +49,11 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 //        taskManager.deleteEpicById(4);
 //        System.out.println(taskManager.getHistory()); //3,1,6
 //        taskManager.save();
-        taskManager.loadFromFile();
-        System.out.println(taskManager.getTasks());
-        System.out.println(taskManager.getEpics());
-        System.out.println(taskManager.getSubtasks());
+//        System.out.println(taskManager.getTasks());
+//        System.out.println(taskManager.getEpics());
+//        System.out.println(taskManager.getSubtasks());
+        System.out.println(taskManager.getHistory());
+
     }
 
 
@@ -166,28 +169,40 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
             for (Subtask subtask : getSubtasks().values()) {
                 fw.write(toString(subtask) + "\n");
             }
+            fw.write("***\n"); // строка разделитель
+            fw.write(historyToString(super.historyManager));
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
     }
 
-    public void loadFromFile() {
+    public static FileBackedTasksManager loadFromFile() {
+        FileBackedTasksManager fm = new FileBackedTasksManager();
         try (BufferedReader br = new BufferedReader(new FileReader(PATH_FILE))) {
             br.readLine(); // Пропуск 1 строки с названиями столбцов
             while (br.ready()) {
                 String line = br.readLine();
-                Task entity = fromString(line);
-                if (entity instanceof Subtask) {
-                    newSubtask((Subtask) entity);
-                } else if (entity instanceof Epic) {
-                    newEpic((Epic) entity);
-                } else {
-                    newTask(entity);
+                if (line.equals("***")) {
+                    line = br.readLine();
+                    for (Integer historyId : historyFromString(line)){
+                        fm.historyManager.add(fm.getTask(historyId));
+                    }
+                } else{
+                    Task entity = fromString(line);
+                    if (entity instanceof Subtask) {
+                        fm.newSubtask((Subtask) entity);
+                    } else if (entity instanceof Epic) {
+                        fm.newEpic((Epic) entity);
+                    } else {
+                        fm.newTask(entity);
+                    }
                 }
             }
+
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
+        return fm;
     }
 
     private String toString(Task task) {
@@ -218,5 +233,22 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
             case Type.EPIC -> new Epic(name, description, status, id);
             case Type.SUBTASK -> new Subtask(name, description, status, id, Integer.parseInt(valueArr[5]));
         };
+    }
+
+    private static String historyToString(HistoryManager manager) {
+        StringBuilder sb = new StringBuilder();
+        for (Task task : manager.getHistory()) {
+            sb.append(task.getId()).append(",");
+        }
+        sb.deleteCharAt(sb.length() - 1);
+        return sb.toString();
+    }
+
+    private static List<Integer> historyFromString(String value) {
+        List<Integer> history = new ArrayList<>();
+        for (String s : value.split(",")) {
+            history.add(Integer.parseInt(s));
+        }
+        return history;
     }
 }
