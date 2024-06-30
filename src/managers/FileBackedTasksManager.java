@@ -13,12 +13,14 @@ import java.util.Scanner;
 
 public class FileBackedTasksManager extends InMemoryTaskManager {
 
-    private final static String PATH_FILE = "save.csv";
+    private static final String PATH_FILE = "save.csv";
+    private static final String SEP = ",";
+    private static final String STRING_SEP = "***";
 
 
     public static void main(String[] args) {
         while (true) {
-            System.out.println("Что делаем?\n 1. Тестируем сохранение в save.csv \n" +
+            System.out.println("Что делаем?\n1. Тестируем сохранение в save.csv \n" +
                     "2. Тестируем загрузку с файла\n" +
                     "3. Тестируем выброс исключения");
             Scanner scanner = new Scanner(System.in);
@@ -155,7 +157,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
     public void save() {
         try (FileWriter fw = new FileWriter(PATH_FILE)) {
-            fw.write(String.join(",", "id", "type", "name", "status", "description", "epic") + "\n");
+            fw.write(String.join(SEP, "id", "type", "name", "status", "description", "epic") + "\n");
             for (Task task : getTasks().values()) {
                 fw.write(toString(task) + "\n");
             }
@@ -166,7 +168,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                 fw.write(toString(subtask) + "\n");
             }
             if (!getHistory().isEmpty()) {
-                fw.write("***\n"); // строка разделитель
+                fw.write(STRING_SEP + "\n");
                 fw.write(historyToString(super.historyManager));
             }
         } catch (IOException e) {
@@ -180,7 +182,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
             br.readLine(); // Пропуск 1 строки с названиями столбцов
             while (br.ready()) {
                 String line = br.readLine();
-                if (line.equals("***")) {
+                if (line.equals(STRING_SEP)) {
                     line = br.readLine();
                     for (Integer historyId : historyFromString(line)) {
                         fm.historyManager.add(fm.getTask(historyId));
@@ -205,38 +207,34 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
     private String toString(Task task) {
         StringBuilder sb = new StringBuilder();
-        sb.append(task.getId()).append(",").append(",").append(task.getName()).append(",")
-                .append(task.getStatus()).append(",").append(task.getDescription());
+        sb.append(task.getId()).append(SEP).append(task.getClass().getSimpleName().toUpperCase())
+                .append(SEP).append(task.getName()).append(SEP).append(task.getStatus())
+                .append(SEP).append(task.getDescription());
         if (task instanceof Subtask) {
-            sb.insert(sb.indexOf(",") + 1, Type.SUBTASK).append(",").append(((Subtask) task).getEpicId());
-            return sb.toString();
-        } else if (task instanceof Epic) {
-            sb.insert(sb.indexOf(",") + 1, Type.EPIC);
-            return sb.toString();
-        } else {
-            sb.insert(sb.indexOf(",") + 1, Type.TASK);
+            sb.append(SEP).append(((Subtask) task).getEpicId());
             return sb.toString();
         }
+        return sb.toString();
     }
 
     private static Task fromString(String value) {
-        String[] valueArr = value.split(",");
+        String[] valueArr = value.split(SEP);
         int id = Integer.parseInt(valueArr[0]);
-        Type type = Type.valueOf(valueArr[1]);
+        TypeTask typeTask = TypeTask.valueOf(valueArr[1]);
         String name = valueArr[2];
         Status status = Status.valueOf(valueArr[3]);
         String description = valueArr[4];
-        return switch (type) {
-            case Type.TASK -> new Task(name, description, status, id);
-            case Type.EPIC -> new Epic(name, description, status, id);
-            case Type.SUBTASK -> new Subtask(name, description, status, id, Integer.parseInt(valueArr[5]));
+        return switch (typeTask) {
+            case TypeTask.TASK -> new Task(name, description, status, id);
+            case TypeTask.EPIC -> new Epic(name, description, status, id);
+            case TypeTask.SUBTASK -> new Subtask(name, description, status, id, Integer.parseInt(valueArr[5]));
         };
     }
 
-    private static String historyToString(HistoryManager manager) {
+    private String historyToString(HistoryManager manager) {
         StringBuilder sb = new StringBuilder();
         for (Task task : manager.getHistory()) {
-            sb.append(task.getId()).append(",");
+            sb.append(task.getId()).append(SEP);
         }
         sb.deleteCharAt(sb.length() - 1);
         return sb.toString();
@@ -244,7 +242,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
     private static List<Integer> historyFromString(String value) {
         List<Integer> history = new ArrayList<>();
-        for (String s : value.split(",")) {
+        for (String s : value.split(SEP)) {
             history.add(Integer.parseInt(s));
         }
         return history;

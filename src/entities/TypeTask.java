@@ -1,6 +1,6 @@
 package entities;
 
-public enum Type {
+public enum TypeTask {
     EPIC,
     TASK,
     SUBTASK
