@@ -31,10 +31,6 @@ public interface TaskManager {
 
     Task getTask(long id);
 
-    Epic getEpic(long id);
-
-    Subtask getSubtask(long id);
-
     List<Subtask> getSubtaskByEpicId(long id);
 
     void removeTasks();

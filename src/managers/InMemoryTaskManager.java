@@ -14,12 +14,13 @@ public class InMemoryTaskManager implements TaskManager {
     private final Map<Long, Task> tasks = new HashMap<>();
     private final Map<Long, Epic> epics = new HashMap<>();
     private final Map<Long, Subtask> subtasks = new HashMap<>();
-    private final HistoryManager historyManager = HistoryManagersCreator.getDefaultHistory();
+    protected final HistoryManager historyManager = HistoryManagersCreator.getDefaultHistory();
     private long idCount = 0;
 
-    private long generateId() {
-        idCount++;
-        return idCount;
+    private void generateId(Task task) {
+        if (task.getId() == 0){
+            task.setId(++idCount);
+        }
     }
 
     @Override
@@ -30,7 +31,7 @@ public class InMemoryTaskManager implements TaskManager {
                 return;
             }
         }
-        newTask.setId(generateId());
+        generateId(newTask);
         tasks.put(newTask.getId(), newTask);
     }
 
@@ -42,20 +43,20 @@ public class InMemoryTaskManager implements TaskManager {
                 return;
             }
         }
-        newEpic.setId(generateId());
+        generateId(newEpic);
         epics.put(newEpic.getId(), newEpic);
     }
 
     @Override
     public void newSubtask(Subtask newSubtask) {
-        if (!epics.containsKey(newSubtask.getEpicId())) return; //Проверка что есть эпик с таким id
+        if (!epics.containsKey(newSubtask.getEpicId())) return; //Проверка, что есть эпик с таким id
         for (Subtask subtask : subtasks.values()) {
             if (newSubtask.equals(subtask)) {
                 System.out.println("Такая подзадача уже есть!");
                 return;
             }
         }
-        newSubtask.setId(generateId());
+        generateId(newSubtask);
         subtasks.put(newSubtask.getId(), newSubtask);
         epics.get(newSubtask.getEpicId()).addSubtasksId(newSubtask.getId()); //Добавляем инфу о сабтасках в эпик
         updateEpicStatus(newSubtask.getEpicId());
@@ -115,20 +116,17 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Task getTask(long id) { //Получение задачи по id
-        updateHistory(tasks.get(id)); //Обновляем историю просмотра
-        return tasks.get(id);
-    }
-
-    @Override
-    public Epic getEpic(long id) {
-        updateHistory(epics.get(id));
-        return epics.get(id);
-    }
-
-    @Override
-    public Subtask getSubtask(long id) {
-        updateHistory(subtasks.get(id));
-        return subtasks.get(id);
+        if (tasks.containsKey(id)){
+            updateHistory(tasks.get(id)); //Обновляем историю просмотра
+            return tasks.get(id);
+        } else if (epics.containsKey(id)) {
+            updateHistory(epics.get(id));
+            return epics.get(id);
+        } else if (subtasks.containsKey(id)) {
+            updateHistory(subtasks.get(id));
+            return subtasks.get(id);
+        }
+        return null;
     }
 
     @Override

@@ -1,6 +1,7 @@
 import entities.Epic;
 import entities.Subtask;
 import entities.Task;
+import managers.FileBackedTasksManager;
 import managers.TaskManagersCreator;
 import managers.TaskManager;
 
@@ -24,12 +25,12 @@ public class Main {
         System.out.println(taskManager.getHistory()); //Должен быть список просмотра без повтора в порядке 2,3,1
         taskManager.deleteTaskById(2);
         System.out.println(taskManager.getHistory()); //Должен быть список просмотра без повтора в порядке 3,1
-        taskManager.getEpic(6);
-        taskManager.getEpic(6);
+        taskManager.getTask(6);
+        taskManager.getTask(6);
         System.out.println(taskManager.getHistory()); //3,1,6
-        taskManager.getEpic(4);
-        taskManager.getSubtask(7);
-        taskManager.getSubtask(8);
+        taskManager.getTask(4);
+        taskManager.getTask(7);
+        taskManager.getTask(8);
         System.out.println(taskManager.getHistory()); //3,1,6,4,7,8
         taskManager.deleteEpicById(4);
         System.out.println(taskManager.getHistory()); //3,1,6
