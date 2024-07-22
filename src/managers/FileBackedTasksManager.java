@@ -13,10 +13,13 @@ import java.util.Scanner;
 
 public class FileBackedTasksManager extends InMemoryTaskManager {
 
-    private static final String PATH_FILE = "save.csv";
+    private final String PATH_FILE;
     private static final String SEP = ",";
     private static final String STRING_SEP = "***";
 
+    public FileBackedTasksManager(String savePath) {
+        PATH_FILE = savePath;
+    }
 
     public static void main(String[] args) {
         while (true) {
@@ -42,7 +45,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     }
 
     public static void testCreateTasksAndHistory() {
-        FileBackedTasksManager taskManager = new FileBackedTasksManager();
+        FileBackedTasksManager taskManager = new FileBackedTasksManager("save.csv");
         taskManager.newTask(new Task("Задача 1", "Описание 1 задачи"));
         taskManager.newTask(new Task("Задача 2", "Описание 2 супер задачи"));
         taskManager.newTask(new Task("Задача 3", "Описание 3 супер задачи"));
@@ -177,7 +180,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     }
 
     public static FileBackedTasksManager loadFromFile(String filePath) {
-        FileBackedTasksManager fm = new FileBackedTasksManager();
+        FileBackedTasksManager fm = new FileBackedTasksManager(filePath);
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             br.readLine(); // Пропуск 1 строки с названиями столбцов
             while (br.ready()) {

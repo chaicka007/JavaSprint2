@@ -5,6 +5,7 @@ import java.util.ArrayList;
 public class Epic extends Task {
     private ArrayList<Long> subtasksId = new ArrayList<>();
 
+
     public Epic(String name, String description) {
         super(name, description);
     }
@@ -20,6 +21,7 @@ public class Epic extends Task {
     public void addSubtasksId(long id) {
         subtasksId.add(id);
     }
+    
 
     @Override
     public String toString() {
