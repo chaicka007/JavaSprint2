@@ -1,79 +1,30 @@
 package managers;
 
-import entities.*;
+import entities.Epic;
+import entities.Status;
+import entities.Subtask;
+import entities.Task;
+import entities.TypeTask;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
+import java.util.Objects;
 
 
 public class FileBackedTasksManager extends InMemoryTaskManager {
 
-    private static final String PATH_FILE = "save.csv";
+    private final String PATH_FILE;
     private static final String SEP = ",";
     private static final String STRING_SEP = "***";
 
-
-    public static void main(String[] args) {
-        while (true) {
-            System.out.println("Что делаем?\n1. Тестируем сохранение в save.csv \n" +
-                    "2. Тестируем загрузку с файла\n" +
-                    "3. Тестируем выброс исключения");
-            Scanner scanner = new Scanner(System.in);
-            int choice = scanner.nextInt();
-            switch (choice) {
-                case 1:
-                    testCreateTasksAndHistory();
-                    break;
-                case 2:
-                    testLoadFromFileAndPrintHistory();
-                    break;
-                case 3:
-                    testException();
-                    break;
-                case 0:
-                    return;
-            }
-        }
+    public FileBackedTasksManager(String savePath) {
+        PATH_FILE = savePath;
     }
-
-    public static void testCreateTasksAndHistory() {
-        FileBackedTasksManager taskManager = new FileBackedTasksManager();
-        taskManager.newTask(new Task("Задача 1", "Описание 1 задачи"));
-        taskManager.newTask(new Task("Задача 2", "Описание 2 супер задачи"));
-        taskManager.newTask(new Task("Задача 3", "Описание 3 супер задачи"));
-        taskManager.newTask(new Task("Задача 4", "desc4", Status.NEW, 33));
-        taskManager.newEpic(new Epic("Эпик 1", "asasa"));
-        taskManager.newEpic(new Epic("эпик 2", "sasa"));
-        taskManager.newEpic(new Epic("эпик 3", "sasa"));
-        taskManager.newSubtask(new Subtask("Подзадача 1 эпика 1", "ее описание", 4));
-        taskManager.newSubtask(new Subtask("Подзадача 2 эпика 1", "ее описание", 4));
-        taskManager.newSubtask(new Subtask("Подзадача 1 эпика 2", "ее описание", 5));
-        taskManager.getTask(1);
-        taskManager.getTask(2);
-        taskManager.getTask(3);
-        taskManager.getTask(4);
-        taskManager.getTask(7);
-        taskManager.getTask(8);
-        System.out.println(taskManager.getHistory());
-    }
-
-    public static void testLoadFromFileAndPrintHistory() {
-        FileBackedTasksManager taskManager = FileBackedTasksManager.loadFromFile("save.csv");
-        System.out.println("История " + taskManager.getHistory());
-        System.out.println("Таски " + taskManager.getTasks());
-        System.out.println("Эпики " + taskManager.getEpics());
-        System.out.println("Саб таски " + taskManager.getSubtasks());
-    }
-
-    public static void testException() {
-        FileBackedTasksManager taskManager = FileBackedTasksManager.loadFromFile("abraKadabra.csv");
-    }
-
 
     @Override
     public void newTask(Task newTask) {
@@ -157,7 +108,8 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
     public void save() {
         try (FileWriter fw = new FileWriter(PATH_FILE)) {
-            fw.write(String.join(SEP, "id", "type", "name", "status", "description", "epic") + "\n");
+            fw.write(String.join(SEP, "id", "type", "name", "status", "description",
+                    "startTime", "duration", "endTime", "epic") + "\n");
             for (Task task : getTasks().values()) {
                 fw.write(toString(task) + "\n");
             }
@@ -177,7 +129,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     }
 
     public static FileBackedTasksManager loadFromFile(String filePath) {
-        FileBackedTasksManager fm = new FileBackedTasksManager();
+        FileBackedTasksManager fm = new FileBackedTasksManager(filePath);
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             br.readLine(); // Пропуск 1 строки с названиями столбцов
             while (br.ready()) {
@@ -209,7 +161,8 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         StringBuilder sb = new StringBuilder();
         sb.append(task.getId()).append(SEP).append(task.getClass().getSimpleName().toUpperCase())
                 .append(SEP).append(task.getName()).append(SEP).append(task.getStatus())
-                .append(SEP).append(task.getDescription());
+                .append(SEP).append(task.getDescription()).append(SEP).append(task.getStartTime())
+                .append(SEP).append(task.getDuration());
         if (task instanceof Subtask) {
             sb.append(SEP).append(((Subtask) task).getEpicId());
             return sb.toString();
@@ -224,10 +177,13 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         String name = valueArr[2];
         Status status = Status.valueOf(valueArr[3]);
         String description = valueArr[4];
+        LocalDateTime startTime = (!Objects.equals(valueArr[5], "null")) ? LocalDateTime.parse(valueArr[5]) : null;
+        int duration = Integer.parseInt(valueArr[6]);
         return switch (typeTask) {
-            case TypeTask.TASK -> new Task(name, description, status, id);
+            case TypeTask.TASK -> new Task(name, description, status, id, startTime, duration);
             case TypeTask.EPIC -> new Epic(name, description, status, id);
-            case TypeTask.SUBTASK -> new Subtask(name, description, status, id, Integer.parseInt(valueArr[5]));
+            case TypeTask.SUBTASK ->
+                    new Subtask(name, description, status, id, startTime, duration, Integer.parseInt(valueArr[7]));
         };
     }
 

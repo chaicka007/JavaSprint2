@@ -1,5 +1,6 @@
 package entities;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Task {
@@ -7,19 +8,39 @@ public class Task {
     private String description;
     private Status status;
     private long id;
+    private int duration;
+    private LocalDateTime startTime;
 
     public Task(String name, String description) {
         this.name = name;
         this.description = description;
         this.status = entities.Status.NEW;
+        this.duration = 0;
     }
 
+    public Task(String name, String description, LocalDateTime startTime, int duration) {
+        this.name = name;
+        this.description = description;
+        this.startTime = startTime;
+        this.duration = duration;
+        this.status = entities.Status.NEW;
+    }
 
     public Task(String name, String description, Status status, long id) {
         this.name = name;
         this.description = description;
         this.status = status;
         this.id = id;
+        this.duration = 0;
+    }
+
+    public Task(String name, String description, Status status, long id, LocalDateTime startTime, int duration) {
+        this.name = name;
+        this.description = description;
+        this.status = status;
+        this.id = id;
+        this.startTime = startTime;
+        this.duration = duration;
     }
 
     public String getName() {
@@ -46,6 +67,29 @@ public class Task {
         return id;
     }
 
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public void setDuration(int duration) {
+        this.duration = duration;
+    }
+
+    public int getDuration() {
+        return duration;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public LocalDateTime getEndTime() {
+        if (!(startTime == null)) {
+            return startTime.plusMinutes(duration);
+        }
+        return null;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -68,6 +112,8 @@ public class Task {
                 ", description='" + description + '\'' +
                 ", status=" + status +
                 ", id=" + id +
+                ", duration=" + duration +
+                ", startTime=" + startTime +
                 '}';
     }
 }
