@@ -10,13 +10,13 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
 
 public class InMemoryTaskManager implements TaskManager {
     private final Map<Long, Task> tasks = new HashMap<>();
     private final Map<Long, Epic> epics = new HashMap<>();
     private final Map<Long, Subtask> subtasks = new HashMap<>();
-    private final TreeSet<Task> sortedTasksByTime = new TreeSet<>(new TasksByDateComparator());
     protected final HistoryManager historyManager = HistoryManagersCreator.getDefaultHistory();
     private long idCount = 0;
 
@@ -41,7 +41,6 @@ public class InMemoryTaskManager implements TaskManager {
         }
         generateId(newTask);
         tasks.put(newTask.getId(), newTask);
-        sortedTasksByTime.add(newTask);
     }
 
     @Override
@@ -74,7 +73,6 @@ public class InMemoryTaskManager implements TaskManager {
         epics.get(newSubtask.getEpicId()).addSubtasksId(newSubtask.getId()); //Добавляем инфу о сабтасках в эпик
         updateEpicStatus(newSubtask.getEpicId());
         updateEpicStartAndEndTime(newSubtask.getEpicId());
-        sortedTasksByTime.add(newSubtask);
     }
 
     @Override
@@ -82,14 +80,13 @@ public class InMemoryTaskManager implements TaskManager {
         // проверка, что id задачи существует и задача не повторяется
         if (tasks.containsKey(updateTask.getId()) && !updateTask.equals(tasks.get(updateTask.getId()))) {
             Task oldTask = tasks.get(updateTask.getId()); //Запоминаем старую версию таски
-            sortedTasksByTime.remove(tasks.get(updateTask.getId()));
+            tasks.remove(oldTask.getId());
             if (isDataTimeCollisionInTask(updateTask)) {
                 System.out.println("Задача не обновлена: пересечение времени!");
-                sortedTasksByTime.add(oldTask); //Возвращем задачу в список, если не получилось обновить
+                tasks.put(oldTask.getId(), oldTask); // Возвращаем старую задачу если не получилось обновить
                 return;
             }
             tasks.put(updateTask.getId(), updateTask);
-            sortedTasksByTime.add(updateTask);
         }
     }
 
@@ -104,23 +101,21 @@ public class InMemoryTaskManager implements TaskManager {
     public void updateSubtask(Subtask updateSubtask) {
         if (subtasks.containsKey(updateSubtask.getId()) && !updateSubtask.equals(subtasks.get(updateSubtask.getId()))) {
             Subtask oldSubtask = subtasks.get(updateSubtask.getId());
-            sortedTasksByTime.remove(subtasks.get(updateSubtask.getId()));
+            subtasks.remove(oldSubtask.getId());
             if (isDataTimeCollisionInTask(updateSubtask)) {
                 System.out.println("Задача не обновлена: пересечение времени!");
-                sortedTasksByTime.add(oldSubtask); //Возвращем старую версию задачи в список, если не получилось обновить
+                subtasks.put(oldSubtask.getId(), oldSubtask);
                 return;
             }
             subtasks.put(updateSubtask.getId(), updateSubtask);
             updateEpicStatus(updateSubtask.getEpicId()); //Обновляем эпик при обновлении подзадачи
             updateEpicStartAndEndTime(updateSubtask.getEpicId());
-            sortedTasksByTime.add(updateSubtask);
         }
     }
 
     @Override
     public void deleteTaskById(long id) { //удаление задачи по id
         historyManager.remove(id);
-        sortedTasksByTime.remove(tasks.get(id));
         tasks.remove(id);
     }
 
@@ -141,7 +136,6 @@ public class InMemoryTaskManager implements TaskManager {
         if (subtasks.containsKey(id)) {
             long idEpic = subtasks.get(id).getEpicId();
             historyManager.remove(id);
-            sortedTasksByTime.remove(subtasks.get(id));
             subtasks.remove(id);
             delEpicSubtaskId(idEpic, id);
             updateEpicStatus(idEpic);
@@ -226,6 +220,9 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public List<Task> getPrioritizedTasks() {
+        final Set<Task> sortedTasksByTime = new TreeSet<>(new TasksByDateComparator());
+        sortedTasksByTime.addAll(tasks.values());
+        sortedTasksByTime.addAll(subtasks.values());
         return new ArrayList<>(sortedTasksByTime);
     }
 
@@ -233,7 +230,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (task.getStartTime() == null || task.getEndTime() == null) {
             return false;
         }
-        for (Task sortedTask : sortedTasksByTime) {
+        for (Task sortedTask : getPrioritizedTasks()) {
             if (sortedTask.getStartTime() == null) {
                 continue;
             }

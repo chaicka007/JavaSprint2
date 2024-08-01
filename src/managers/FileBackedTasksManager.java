@@ -109,7 +109,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     public void save() {
         try (FileWriter fw = new FileWriter(PATH_FILE)) {
             fw.write(String.join(SEP, "id", "type", "name", "status", "description",
-                    "startTime", "duration", "endTime", "epic") + "\n");
+                    "startTime", "duration", "epic") + "\n");
             for (Task task : getTasks().values()) {
                 fw.write(toString(task) + "\n");
             }

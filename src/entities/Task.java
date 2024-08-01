@@ -8,7 +8,7 @@ public class Task {
     private String description;
     private Status status;
     private long id;
-    private int duration;
+    private Integer duration;
     private LocalDateTime startTime;
 
     public Task(String name, String description) {
