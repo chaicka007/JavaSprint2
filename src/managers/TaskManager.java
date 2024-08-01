@@ -3,7 +3,7 @@ package managers;
 import entities.Epic;
 import entities.Subtask;
 import entities.Task;
-import java.util.ArrayList;
+
 import java.util.List;
 import java.util.Map;
 
@@ -44,6 +44,9 @@ public interface TaskManager {
     Map<Long, Epic> getEpics();
 
     Map<Long, Subtask> getSubtasks();
+
     List<Task> getHistory();
+
+    List<Task> getPrioritizedTasks();
 
 }
