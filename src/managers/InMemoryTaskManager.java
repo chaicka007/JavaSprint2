@@ -36,8 +36,7 @@ public class InMemoryTaskManager implements TaskManager {
             }
         }
         if (isDataTimeCollisionInTask(newTask)) {
-            System.out.println("Задача не добавлена: пересечение времени!");
-            return;
+            throw new DataTimeCollisionException("Задача не добавлена: пересечение времени!");
         }
         generateId(newTask);
         tasks.put(newTask.getId(), newTask);
@@ -65,8 +64,7 @@ public class InMemoryTaskManager implements TaskManager {
             }
         }
         if (isDataTimeCollisionInTask(newSubtask)) {
-            System.out.println("Задача не добавлена: пересечение времени!");
-            return;
+            throw new DataTimeCollisionException("Задача не добавлена: пересечение времени!");
         }
         generateId(newSubtask);
         subtasks.put(newSubtask.getId(), newSubtask);
@@ -82,9 +80,8 @@ public class InMemoryTaskManager implements TaskManager {
             Task oldTask = tasks.get(updateTask.getId()); //Запоминаем старую версию таски
             tasks.remove(oldTask.getId());
             if (isDataTimeCollisionInTask(updateTask)) {
-                System.out.println("Задача не обновлена: пересечение времени!");
                 tasks.put(oldTask.getId(), oldTask); // Возвращаем старую задачу если не получилось обновить
-                return;
+                throw new DataTimeCollisionException("Задача не обновлена: пересечение времени!");
             }
             tasks.put(updateTask.getId(), updateTask);
         }
@@ -103,9 +100,8 @@ public class InMemoryTaskManager implements TaskManager {
             Subtask oldSubtask = subtasks.get(updateSubtask.getId());
             subtasks.remove(oldSubtask.getId());
             if (isDataTimeCollisionInTask(updateSubtask)) {
-                System.out.println("Задача не обновлена: пересечение времени!");
                 subtasks.put(oldSubtask.getId(), oldSubtask);
-                return;
+                throw new DataTimeCollisionException("Задача не обновлена: пересечение времени!");
             }
             subtasks.put(updateSubtask.getId(), updateSubtask);
             updateEpicStatus(updateSubtask.getEpicId()); //Обновляем эпик при обновлении подзадачи
@@ -257,16 +253,17 @@ public class InMemoryTaskManager implements TaskManager {
             epic.setDuration(subtasks.get(epic.getSubtasksId().getFirst()).getDuration());
             epic.setEndTime(subtasks.get(epic.getSubtasksId().getFirst()).getEndTime());
         } else {
-            List<Subtask> subtasksOfEpic = new ArrayList<>(List.of());
+            List<Subtask> subtasksOfEpic = new ArrayList<>();
             int allDuration = 0;
             for (Long subtaskId : epic.getSubtasksId()) {
                 if (subtasks.get(subtaskId).getStartTime() != null && subtasks.get(subtaskId).getEndTime() != null) {
                     subtasksOfEpic.add(subtasks.get(subtaskId));
                     allDuration += subtasks.get(subtaskId).getDuration();
-                    epic.setDuration(allDuration); // Проверка что есть инфа о времени старта
+                    // Проверка что есть инфа о времени старта
                 }
 
             }
+            epic.setDuration(allDuration);
             if (subtasksOfEpic.isEmpty()) {
                 return;
             }

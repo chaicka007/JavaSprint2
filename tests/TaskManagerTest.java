@@ -2,16 +2,15 @@ import entities.Epic;
 import entities.Status;
 import entities.Subtask;
 import entities.Task;
+import managers.DataTimeCollisionException;
 import managers.TaskManager;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 abstract class TaskManagerTest<T extends TaskManager> {
@@ -259,7 +258,13 @@ abstract class TaskManagerTest<T extends TaskManager> {
         Task newTask = new Task("task", "description", LocalDateTime.parse("2024-07-22 08:00:00", formatter), 60 * 1);
         Task newTask2 = new Task("task2", "description", LocalDateTime.parse("2024-07-22 09:00:00", formatter), 60 * 1);
         manager.newTask(newTask);
-        manager.newTask(newTask2);
+        DataTimeCollisionException ex = assertThrows(DataTimeCollisionException.class, new Executable() {
+            @Override
+            public void execute(){
+                manager.newTask(newTask2);
+            }
+        });
+        assertEquals("Задача не добавлена: пересечение времени!", ex.getMessage());
         assertEquals(1, manager.getTasks().size());
     }
     @Test
@@ -280,7 +285,13 @@ abstract class TaskManagerTest<T extends TaskManager> {
         manager.newTask(newTask);
         manager.newTask(newTask2);
         Task updatedTask2 = new Task("task2", "description", Status.IN_PROGRESS, 2, LocalDateTime.parse("2024-07-22 09:00:00", formatter), 60 * 1);
-        manager.updateTask(updatedTask2);
+        DataTimeCollisionException ex = assertThrows(DataTimeCollisionException.class, new Executable() {
+            @Override
+            public void execute(){
+                manager.updateTask(updatedTask2);
+            }
+        });
+        assertEquals("Задача не обновлена: пересечение времени!", ex.getMessage());
         assertEquals(newTask2, manager.getTask(2));
     }
 
@@ -301,7 +312,13 @@ abstract class TaskManagerTest<T extends TaskManager> {
         Epic newEpic = new Epic("epic", "description");
         manager.newEpic(newEpic);
         manager.newSubtask(newSubtask);
-        manager.newSubtask(newSubtask2);
+        DataTimeCollisionException ex = assertThrows(DataTimeCollisionException.class, new Executable() {
+            @Override
+            public void execute(){
+                manager.newSubtask(newSubtask2);
+            }
+        });
+        assertEquals("Задача не добавлена: пересечение времени!", ex.getMessage());
         assertEquals(1, manager.getSubtasks().size());
     }
 
@@ -314,7 +331,13 @@ abstract class TaskManagerTest<T extends TaskManager> {
         manager.newSubtask(newSubtask);
         manager.newSubtask(newSubtask2);
         Subtask updateSubtask = new Subtask("subtask 2", "", Status.IN_PROGRESS, 3, LocalDateTime.parse("2024-07-22 08:30:00", formatter), 60, 1 );
-        manager.updateSubtask(updateSubtask);
+        DataTimeCollisionException ex = assertThrows(DataTimeCollisionException.class, new Executable() {
+            @Override
+            public void execute(){
+                manager.updateSubtask(updateSubtask);
+            }
+        });
+        assertEquals("Задача не обновлена: пересечение времени!", ex.getMessage());
         assertEquals(newSubtask2, manager.getTask(3));
     }
 
