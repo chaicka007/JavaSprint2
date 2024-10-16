@@ -1,4 +1,4 @@
-package managers;
+package exceptions;
 
 public class DataTimeCollisionException extends RuntimeException{
     public DataTimeCollisionException (String message){

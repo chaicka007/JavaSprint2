@@ -1,8 +1,8 @@
 import entities.Epic;
 import entities.Status;
 import entities.Subtask;
+import managers.InMemoryTaskManager;
 import managers.TaskManager;
-import managers.TaskManagersCreator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,7 +13,7 @@ class EpicTest {
 
     @BeforeEach
     public void beforeEach(){
-        taskManager = TaskManagersCreator.getDefault();
+        taskManager = new InMemoryTaskManager();
     }
 
     @Test

@@ -4,6 +4,8 @@ import entities.Epic;
 import entities.Status;
 import entities.Subtask;
 import entities.Task;
+import exceptions.DataTimeCollisionException;
+import exceptions.EqualsTaskExistException;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -14,11 +16,11 @@ import java.util.Set;
 import java.util.TreeSet;
 
 public class InMemoryTaskManager implements TaskManager {
-    private final Map<Long, Task> tasks = new HashMap<>();
-    private final Map<Long, Epic> epics = new HashMap<>();
-    private final Map<Long, Subtask> subtasks = new HashMap<>();
+    protected final Map<Long, Task> tasks = new HashMap<>();
+    protected final Map<Long, Epic> epics = new HashMap<>();
+    protected final Map<Long, Subtask> subtasks = new HashMap<>();
     protected final HistoryManager historyManager = HistoryManagersCreator.getDefaultHistory();
-    private long idCount = 0;
+    protected long idCount = 0;
 
     private void generateId(Task task) {
         if (task.getId() == 0) {
@@ -31,8 +33,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void newTask(Task newTask) { //Создание новой задачи
         for (Task task : tasks.values()) {
             if (newTask.equals(task)) {
-                System.out.println("такая задача уже есть");
-                return;
+                throw new EqualsTaskExistException("Такая задача уже есть!");
             }
         }
         if (isDataTimeCollisionInTask(newTask)) {
@@ -46,8 +47,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void newEpic(Epic newEpic) {
         for (Epic epic : epics.values()) {
             if (newEpic.equals(epic)) {
-                System.out.println("такой эпик уже есть!");
-                return;
+                throw new EqualsTaskExistException("такой эпик уже есть!");
             }
         }
         generateId(newEpic);
@@ -56,11 +56,11 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void newSubtask(Subtask newSubtask) {
-        if (!epics.containsKey(newSubtask.getEpicId())) return; //Проверка, что есть эпик с таким id
+        //Проверка, что есть эпик с таким id
+        if (!epics.containsKey(newSubtask.getEpicId())) throw new IllegalArgumentException("Нет такого эпика");
         for (Subtask subtask : subtasks.values()) {
             if (newSubtask.equals(subtask)) {
-                System.out.println("Такая подзадача уже есть!");
-                return;
+                throw new EqualsTaskExistException("Такая подзадача уже есть!");
             }
         }
         if (isDataTimeCollisionInTask(newSubtask)) {
@@ -91,6 +91,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void updateEpic(Epic updateEpic) {
         if (epics.containsKey(updateEpic.getId()) && !updateEpic.equals(epics.get(updateEpic.getId()))) {
             epics.put(updateEpic.getId(), updateEpic);
+            updateEpicStatus(updateEpic.getId());
         }
     }
 
