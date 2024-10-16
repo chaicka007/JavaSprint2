@@ -2,7 +2,7 @@ import entities.Epic;
 import entities.Subtask;
 import entities.Task;
 import managers.FileBackedTasksManager;
-import managers.ManagerSaveException;
+import exceptions.ManagerSaveException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
@@ -10,11 +10,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager> {
-
+private static final String SAVE_PATH = "save.csv";
     public FileBackedTasksManagerTest() {
-        super(new FileBackedTasksManager("save.csv"));
+        super(new FileBackedTasksManager(SAVE_PATH));
     }
-    FileBackedTasksManager manager = new FileBackedTasksManager("save.csv");
+    FileBackedTasksManager manager = new FileBackedTasksManager(SAVE_PATH);
 
     @Test
     void testSaveAndLoadEmptyTaskList(){
@@ -23,7 +23,8 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
         assertEquals(0, manager.getSubtasks().size());
         assertEquals(0, manager.getHistory().size());
         manager.save();
-        FileBackedTasksManager loadedFromFileManager = FileBackedTasksManager.loadFromFile("save.csv");
+        FileBackedTasksManager loadedFromFileManager = new FileBackedTasksManager(SAVE_PATH);
+        loadedFromFileManager.load(SAVE_PATH);
         assertEquals(0, loadedFromFileManager.getTasks().size());
         assertEquals(0, loadedFromFileManager.getEpics().size());
         assertEquals(0, loadedFromFileManager.getSubtasks().size());
@@ -35,7 +36,8 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
         manager.newEpic(new Epic("epic", "description"));
         assertEquals(0, manager.getSubtasks().size());
         assertEquals(1, manager.getEpics().size());
-        FileBackedTasksManager loadedFromFileManager = FileBackedTasksManager.loadFromFile("save.csv");
+        FileBackedTasksManager loadedFromFileManager = new FileBackedTasksManager(SAVE_PATH);
+        loadedFromFileManager.load(SAVE_PATH);
         assertEquals(0, loadedFromFileManager.getSubtasks().size());
         assertEquals(1, loadedFromFileManager.getEpics().size());
     }
@@ -48,7 +50,8 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
 
         assertEquals(2, manager.getSubtasks().size());
         assertEquals(1, manager.getEpics().size());
-        FileBackedTasksManager loadedFromFileManager = FileBackedTasksManager.loadFromFile("save.csv");
+        FileBackedTasksManager loadedFromFileManager = new FileBackedTasksManager(SAVE_PATH);
+        loadedFromFileManager.load(SAVE_PATH);
         assertEquals(2, loadedFromFileManager.getSubtasks().size());
         assertEquals(1, loadedFromFileManager.getEpics().size());
     }
@@ -58,7 +61,8 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
         manager.newSubtask(new Subtask("subtask", "description",1));
         manager.newSubtask(new Subtask("subtask2", "description",1));
         assertEquals(0, manager.getHistory().size());
-        FileBackedTasksManager loadedFromFileManager = FileBackedTasksManager.loadFromFile("save.csv");
+        FileBackedTasksManager loadedFromFileManager = new FileBackedTasksManager(SAVE_PATH);
+        loadedFromFileManager.load(SAVE_PATH);
         assertEquals(0, loadedFromFileManager.getHistory().size());
     }
 
@@ -71,7 +75,8 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
         manager.getTask(2);
         manager.getTask(3);
         assertEquals(3, manager.getHistory().size());
-        FileBackedTasksManager loadedFromFileManager = FileBackedTasksManager.loadFromFile("save.csv");
+        FileBackedTasksManager loadedFromFileManager = new FileBackedTasksManager(SAVE_PATH);
+        loadedFromFileManager.load(SAVE_PATH);
         assertEquals(3, loadedFromFileManager.getHistory().size());
     }
     @Test
@@ -86,7 +91,8 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
         assertEquals(1, manager.getEpics().size());
         assertEquals(3, manager.getHistory().size());
         assertEquals(1, manager.getTasks().size());
-        FileBackedTasksManager loadedFromFileManager = FileBackedTasksManager.loadFromFile("save.csv");
+        FileBackedTasksManager loadedFromFileManager = new FileBackedTasksManager(SAVE_PATH);
+        loadedFromFileManager.load(SAVE_PATH);
         assertEquals(1, loadedFromFileManager.getSubtasks().size());
         assertEquals(1, loadedFromFileManager.getEpics().size());
         assertEquals(3, loadedFromFileManager.getHistory().size());
@@ -98,7 +104,8 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
         ManagerSaveException ex = assertThrows(ManagerSaveException.class, new Executable() {
             @Override
             public void execute(){
-                FileBackedTasksManager.loadFromFile("abrakadabra.csv");
+                FileBackedTasksManager loadedFromFileManager = new FileBackedTasksManager(SAVE_PATH);
+                loadedFromFileManager.load("abrakadabra.csv");
             }
         });
         assertEquals("Ошибка чтения/записи файла", ex.getMessage());

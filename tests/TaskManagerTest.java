@@ -2,7 +2,8 @@ import entities.Epic;
 import entities.Status;
 import entities.Subtask;
 import entities.Task;
-import managers.DataTimeCollisionException;
+import exceptions.DataTimeCollisionException;
+import exceptions.EqualsTaskExistException;
 import managers.TaskManager;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
@@ -26,8 +27,13 @@ abstract class TaskManagerTest<T extends TaskManager> {
     void testCreateExistingTask() {
         Task newTask = new Task("task", "description");
         manager.newTask(newTask);
-        manager.newTask(newTask);
-        manager.newTask(newTask);
+        EqualsTaskExistException ex = assertThrows(EqualsTaskExistException.class, new Executable() {
+            @Override
+            public void execute(){
+                manager.newTask(newTask);
+            }
+        });
+        assertEquals("Такая задача уже есть!", ex.getMessage());
         assertEquals(1, manager.getTasks().size());
     }
 
@@ -35,8 +41,13 @@ abstract class TaskManagerTest<T extends TaskManager> {
     void testCreateExistingEpic() {
         Epic newEpic = new Epic("epic", "description");
         manager.newEpic(newEpic);
-        manager.newEpic(newEpic);
-        manager.newEpic(newEpic);
+        EqualsTaskExistException ex = assertThrows(EqualsTaskExistException.class, new Executable() {
+            @Override
+            public void execute(){
+                manager.newEpic(newEpic);
+            }
+        });
+        assertEquals("такой эпик уже есть!", ex.getMessage());
         assertEquals(1, manager.getEpics().size());
     }
 
@@ -46,7 +57,13 @@ abstract class TaskManagerTest<T extends TaskManager> {
         Subtask newSubtask = new Subtask("subtask", "descrption", 1);
         manager.newEpic(newEpic);
         manager.newSubtask(newSubtask);
-        manager.newSubtask(newSubtask);
+        EqualsTaskExistException ex = assertThrows(EqualsTaskExistException.class, new Executable() {
+            @Override
+            public void execute(){
+                manager.newSubtask(newSubtask);
+            }
+        });
+        assertEquals("Такая подзадача уже есть!", ex.getMessage());
         assertEquals(1, manager.getSubtasks().size());
     }
 

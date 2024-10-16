@@ -5,6 +5,7 @@ import entities.Status;
 import entities.Subtask;
 import entities.Task;
 import entities.TypeTask;
+import exceptions.ManagerSaveException;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -25,6 +26,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     public FileBackedTasksManager(String savePath) {
         PATH_FILE = savePath;
     }
+
 
     @Override
     public void newTask(Task newTask) {
@@ -128,8 +130,14 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         }
     }
 
-    public static FileBackedTasksManager loadFromFile(String filePath) {
-        FileBackedTasksManager fm = new FileBackedTasksManager(filePath);
+    public void load(String filePath) {
+        if (!Objects.equals(filePath, PATH_FILE)) { //проверка одинаковых имен на сохранение и загрузку
+            removeTasks();
+            removeEpics();
+            historyManager.clear();
+        }
+
+        long setupIdCount = 0;
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             br.readLine(); // Пропуск 1 строки с названиями столбцов
             while (br.ready()) {
@@ -137,24 +145,26 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                 if (line.equals(STRING_SEP)) {
                     line = br.readLine();
                     for (Integer historyId : historyFromString(line)) {
-                        fm.historyManager.add(fm.getTask(historyId));
+                        historyManager.add(getTask(historyId));
                     }
                 } else {
                     Task entity = fromString(line);
+                    if (entity.getId() > setupIdCount) {
+                        setupIdCount = entity.getId();
+                    }
                     if (entity instanceof Subtask) {
-                        fm.newSubtask((Subtask) entity);
+                        newSubtask((Subtask) entity);
                     } else if (entity instanceof Epic) {
-                        fm.newEpic((Epic) entity);
+                        newEpic((Epic) entity);
                     } else {
-                        fm.newTask(entity);
+                        newTask(entity);
                     }
                 }
             }
-
+            idCount = setupIdCount;
         } catch (IOException e) {
             throw new ManagerSaveException("Ошибка чтения/записи файла");
         }
-        return fm;
     }
 
     private String toString(Task task) {

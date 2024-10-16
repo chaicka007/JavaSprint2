@@ -40,9 +40,11 @@ public class HistoryList {
         }
     }
 
- /*   private boolean hasNext(Node<Task> node) {
-        return node.next != null;
-    }*/
+    public void clear(){
+        historyMap.clear();
+        head = null;
+        tail = null;
+    }
 
     private void linkLast(Task task) {
         final Node<Task> oldTail = tail;

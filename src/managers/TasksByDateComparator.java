@@ -12,7 +12,7 @@ public class TasksByDateComparator implements Comparator<Task> {
         } else if (o1.getStartTime() != null && o2.getStartTime() == null) {
             return -1;
         } else if (o1.getStartTime() == null && o2.getStartTime() == null) {
-            return 0;
+            return (int) (o1.getId() - o2.getId());
         }
         if (o1.getStartTime().isBefore(o2.getStartTime())) {
             return -1;
